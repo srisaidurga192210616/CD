@@ -1,3 +1,6 @@
+1...CAPITAL WORD
+
+
 %{
 #include <stdio.h>
 %}
@@ -15,3 +18,563 @@ int main() {
     yylex();
     return 0;
 }
+
+2....STRING START WITH VOWEL
+
+%{
+#include <stdio.h>
+%}
+
+%%
+^[aeiouAEIOU][a-zA-Z]*   printf("String starts with a vowel\n");
+.                         printf("String does not start with a vowel\n");
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    yylex();
+    return 0;
+}
+
+3.....NO OF VOWELS AND CONSONENTS
+
+int vowels = 0;
+int consonants = 0;
+%}
+
+%%
+[a-zA-Z]    {
+                if (strchr("aeiouAEIOU", yytext[0]) != NULL) {
+                    vowels++;
+                } else {
+                    consonants++;
+                }
+            }
+.           ; // Ignore non-alphabetic characters
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    yylex();
+    printf("Number of vowels: %d\n", vowels);
+    printf("Number of consonants: %d\n", consonants);
+    return 0;
+}
+
+
+4.....IDENTIFIERS
+
+%{
+#include <stdio.h>
+%}
+
+%%
+
+"auto"|"break"|"case"|"char"|"const"|"continue"|"default"|"do"|"double"|"else"|"enum"|"extern"|"float"|"for"|"goto"|"if"|"int"|"long"|"register"|"return"|"short"|"signed"|"sizeof"|"static"|"struct"|"switch"|"typedef"|"union"|"unsigned"|"void"|"volatile"|"while" { 
+    printf("Keyword: %s\n", yytext); 
+}
+
+[a-zA-Z_][a-zA-Z0-9_]* {
+    printf("Identifier: %s\n", yytext);
+}
+
+[ \t\n]+ {
+    // Ignore whitespace
+}
+
+. {
+    printf("Invalid token: %s\n", yytext);
+}
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    yylex();
+    return 0;
+}
+
+5....NEGETIVE OR POSITIVE
+
+%{
+int positive_no = 0, negative_no = 0;
+%}
+%%
+^[-][0-9]+ {negative_no++;
+			printf("negative number = %s\n",
+				yytext);} // negative number
+
+[0-9]+ {positive_no++;
+		printf("positive number = %s\n",
+				yytext);} // positive number	
+%%
+int yywrap(){}
+int main()											
+{
+yylex();
+printf ("number of positive numbers = %d,"
+		"number of negative numbers = %d\n",
+				positive_no, negative_no);
+return 0;
+}
+
+
+6.......NUMBER AND WORD COUNT OF GIVEN SENTENCE
+
+%{
+#include <stdio.h>
+int num_count = 0;
+int word_count = 0;
+int yywrap(void) { return 1; } // Adjusted yywrap function definition
+%}
+
+DIGITS [0-9]+
+WORDS [a-zA-Z]+
+
+%%
+
+{DIGITS}    { printf("Number: %s\n", yytext); num_count++; }
+{WORDS}     { printf("Word: %s\n", yytext); word_count++; }
+.           ;
+
+%%
+
+int main() {
+    yylex();
+    printf("Total numbers: %d\n", num_count);
+    printf("Total words: %d\n", word_count);
+    return 0;
+}
+
+7....LONGEST WORD 
+
+
+%{
+#include <stdio.h>
+#include <string.h>
+
+int max_length = 0;
+char longest_word[100];
+
+void update_longest_word(char *word) {
+    int len = strlen(word);
+    if (len > max_length) {
+        max_length = len;
+        strcpy(longest_word, word);
+    }
+}
+
+int yywrap(void);
+
+%}
+
+%%
+[a-zA-Z]+ {
+    update_longest_word(yytext);
+}
+.          ;
+
+%%
+
+int yywrap(void) {
+    return 1; // Indicate end of input
+}
+
+int main() {
+    yylex();
+    printf("Longest word: %s\n", longest_word);
+    printf("Length: %d\n", max_length);
+    return 0;
+}
+
+8.....URL VALID OR NOT
+
+Q2%{
+#include <stdio.h>
+%}
+
+%%
+
+^[a-zA-Z]+:\/\/[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}(\/\S*)?$    { printf("Valid URL: %s\n", yytext); }
+.    ;
+
+%%
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    yylex();
+    return 0;
+}
+
+
+9......D O B VALID OR NOT
+
+%{
+#include <stdio.h>
+%}
+
+%%
+[0-9]{4}-((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))    { printf("Valid DOB\n"); return 0; }
+.|\n    { printf("Invalid DOB\n"); return 1; }
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    printf("Enter DOB (YYYY-MM-DD) to validate:\n");
+    yylex();
+    return 0;
+}
+
+
+10.....RELATIONAL OPERATORS 
+
+%{
+#include <stdio.h>
+%}
+
+%%
+[a-zA-Z]+    { printf("Word: %s\n", yytext); }
+[><]=?       { printf("Relational Operator: %s\n", yytext); }
+.            ; /* ignore all other characters */
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    yylex();
+    return 0;
+}
+
+
+11....MATHEMATICAL OPERATORS
+
+%{
+#include<stdio.h>
+float op1=6,op2=7;
+%}
+
+%%
+"+" {printf("sum =%lf",op1+op2);}
+"-" {printf("diff=%lf",op1-op2);}
+"*" {printf("mul=%lf",op1*op2);}
+"/" {printf("div=%lf",op1/op2);}
+. {printf("enter proper operator:\n");}
+%%
+
+int yywrap(){}
+int main()
+{
+printf("enter number 1:\n" );
+printf("enter number 2:\n" );
+printf("Enter the Operator:\n" );
+yylex();
+}
+
+12.....CONSTANTS
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+%}
+
+DIGIT [0-9]
+LETTER [a-zA-Z]
+%%
+{DIGIT}+(\.{DIGIT}+)?([eE][+-]?{DIGIT}+)?   { printf("Constant: %s\n", yytext); }
+0[xX]{LETTER}+  { printf("Constant: %s\n", yytext); }
+{LETTER}+   { printf("Constant: %s\n", yytext); }
+.|\n        ; /* Ignore everything else */
+%%
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *input_file = fopen(argv[1], "r");
+    if (input_file == NULL) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    yyin = input_file;
+    yylex();
+
+    fclose(input_file);
+    return 0;
+}
+
+
+13...... LINE COUNT AND WORD COUNT 
+
+%{
+#include <stdio.h>
+int charCount = 0;
+int lineCount = 0;
+int wordCount = 0;
+%}
+
+%option noyywrap
+
+%%
+
+[ \t]+  ;  // Ignore spaces and tabs
+\n      { lineCount++; }  // Count new lines
+
+"/*"    {
+            while(1) {
+                char c = input();
+                if (c == EOF) {
+                    fprintf(stderr, "Error: Unterminated comment\n");
+                    exit(1);
+                }
+                if (c == '*' && input() == '/') {
+                    break;
+                }
+            }
+        }
+
+"//"    {
+            while(input() != '\n');
+            lineCount++;
+        }
+
+[a-zA-Z_][a-zA-Z0-9_]*    { wordCount++; }
+
+.       { charCount++; }
+
+%%
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Usage: %s <input_file>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *fp = fopen(argv[1], "r");
+    if (fp == NULL) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    yyin = fp;
+    yylex();
+
+    fclose(fp);
+
+    printf("Number of characters: %d\n", charCount);
+    printf("Number of lines: %d\n", lineCount);
+    printf("Number of words: %d\n", wordCount);
+
+    return 0;
+}
+
+
+
+14.....CONSTANTS OF GIVEN FILE 
+
+digit [0-9]
+%{
+int cons=0;
+%}
+%%
+{digit}+ { cons++; printf("%s is a constant\n", yytext);  }
+.|\n { }
+%%
+int yywrap(void) {
+return 1; }
+int main(void)
+{
+FILE *f;
+char file[10];
+printf("Enter File Name : ");
+scanf("%s",file);
+f = fopen(file,"r");
+yyin = f;
+yylex();
+printf("Number of Constants : %d\n", cons);
+fclose(yyin);  
+}
+
+
+15......MACRO AND HEADER FILES
+
+%{
+int nmacro, nheader;
+%}
+%%
+^#define { nmacro++; }
+^#include { nheader++; }
+.|\n {  }
+%%
+int yywrap(void) {
+return 1;
+}
+int main(int argc, char *argv[]) {
+yyin = fopen(argv[1], "r");
+yylex();
+printf("Number of macros defined = %d\n", nmacro);
+printf("Number of header files included = %d\n", nheader);
+fclose(yyin);
+}
+
+
+16....NUMBER OF HTML TAGS
+
+%{
+int tags;
+%}
+%%
+"<"[^>]*>  { tags++; printf("%s \n", yytext); }
+.|\n { }
+%%
+int yywrap(void) {
+return 1; }
+int main(void)
+{
+FILE *f;
+char file[10];
+printf("Enter File Name : ");
+scanf("%s",file);
+f = fopen(file,"r");
+yyin = f;
+yylex();
+printf("\n Number of html tags: %d",tags);
+fclose(yyin);  
+}
+%{
+int tags;
+%}
+%%
+"<"[^>]*>  { tags++; printf("%s \n", yytext); }
+.|\n { }
+%%
+int yywrap(void) {
+return 1; }
+int main(void)
+{
+FILE *f;
+char file[10];
+printf("Enter File Name : ");
+scanf("%s",file);
+f = fopen(file,"r");
+yyin = f;
+yylex();
+printf("\n Number of html tags: %d",tags);
+fclose(yyin);  
+}
+
+
+17.....LINE NUMBERS (SNO)
+
+%{
+int yylineno;
+%}
+%%
+^(.*)\n printf("%4d\t%s", ++yylineno, yytext);
+%%
+int yywrap(void) {
+return 1;
+}
+int main(int argc, char *argv[]) {
+yyin = fopen(argv[1], "r");
+yylex();
+fclose(yyin);
+}
+
+
+18....KEYWORDS AND IDENTIFIERS
+
+digit [0-9]
+letter [A-Za-z]
+%{
+int count_id,count_key;
+%}
+%%
+(stdio.h|conio.h) { printf("%s is a standard library\n",yytext); }
+(include|void|main|printf|int) { printf("%s is a keyword\n",yytext); count_key++; }
+{letter}({letter}|{digit})*  { printf("%s is a identifier\n", yytext); count_id++; }
+{digit}+  { printf("%s is a number\n", yytext); }
+\"(\\.|[^"\\])*\"  { printf("%s is a string literal\n", yytext); }
+.|\n {  }
+%%
+int yywrap(void) {
+return 1;
+}
+int main(int argc, char *argv[]) {
+yyin = fopen(argv[1], "r");
+yylex();
+printf("number of identifiers = %d\n", count_id);
+printf("number of keywords = %d\n", count_key);
+fclose(yyin);
+}
+
+
+19.....CHECK WEATHER GIVEN IS NUMBER OR OPERATOR
+
+%option noyywrap
+
+%{
+#include <stdio.h>
+%}
+
+DIGIT       [0-9]
+OPERATOR    [+\-*\/]
+
+%%
+
+{DIGIT}+    { printf("Number: %s\n", yytext); }
+{OPERATOR}  { printf("Operator: %s\n", yytext); }
+\n          ; // ignore newline characters
+.           ; // ignore any other characters
+
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+
+20.....VALID IDENTIFIER OR NOT
+
+%option noyywrap
+
+%{
+#include <stdio.h>
+%}
+
+%%
+
+[a-zA-Z][a-zA-Z0-9_]*   { printf("Valid identifier: %s\n", yytext); }
+.                        { printf("Invalid identifier: %s\n", yytext); }
+
+%%
+
+int main() {
+    printf("Enter an identifier: ");
+    yylex();
+    return 0;
+}
+
+
+
+
+
